@@ -26,6 +26,18 @@ app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(partials());
 
+app.use(function(req,res,next) {
+	if (req.session.user) {
+		if (Date.now() - req.session.user.hora > 120000) {
+			delete req.session.user;
+			res.redirect('/login');
+		} else {
+			req.session.user.hora = Date.now();
+		}
+	}
+	next();
+});	
+
 //Helpers dinámicos:
 app.use(function(req, res, next) {
 	//guardar path en session.redir para despues de login
